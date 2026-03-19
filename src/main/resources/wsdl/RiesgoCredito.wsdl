@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    WSDL SIMULADO — Sistema legado de Riesgo Crediticio.
+    En un proyecto real este fichero lo da el equipo de sistemas.
+    El plugin cxf-codegen-plugin lo lee y genera las clases Java
+    automáticamente en target/generated-sources/cxf/
+-->
+<definitions
+        xmlns="http://schemas.xmlsoap.org/wsdl/"
+        xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+        xmlns:tns="http://legado.cajarural.com/riesgocrediticio"
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        targetNamespace="http://legado.cajarural.com/riesgocrediticio"
+        name="RiesgoCrediticioService">
+
+    <types>
+        <xsd:schema targetNamespace="http://legado.cajarural.com/riesgocrediticio">
+
+            <!-- El cliente envía el NIF del titular -->
+            <xsd:element name="ConsultarRiesgoRequest">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="nif" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+
+            <!-- El legado devuelve el perfil de riesgo -->
+            <xsd:element name="ConsultarRiesgoResponse">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <!-- Cuántos préstamos activos tiene ya el cliente -->
+                        <xsd:element name="prestamosActivos" type="xsd:int"/>
+                        <!-- BAJO, MEDIO o ALTO -->
+                        <xsd:element name="nivelRiesgo" type="xsd:string"/>
+                        <!-- Deuda total actual en euros -->
+                        <xsd:element name="deudaTotalEuros" type="xsd:decimal"/>
+                        <!-- Si aparece en ficheros de morosos (ASNEF, RAI) -->
+                        <xsd:element name="enFicheroMorosos" type="xsd:boolean"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+
+        </xsd:schema>
+    </types>
+
+    <message name="ConsultarRiesgoRequestMessage">
+        <part name="parameters" element="tns:ConsultarRiesgoRequest"/>
+    </message>
+    <message name="ConsultarRiesgoResponseMessage">
+        <part name="parameters" element="tns:ConsultarRiesgoResponse"/>
+    </message>
+
+    <portType name="RiesgoCrediticioPortType">
+        <operation name="consultarRiesgo">
+            <input message="tns:ConsultarRiesgoRequestMessage"/>
+            <output message="tns:ConsultarRiesgoResponseMessage"/>
+        </operation>
+    </portType>
+
+    <binding name="RiesgoCrediticioBinding" type="tns:RiesgoCrediticioPortType">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <operation name="consultarRiesgo">
+            <soap:operation soapAction="consultarRiesgo"/>
+            <input><soap:body use="literal"/></input>
+            <output><soap:body use="literal"/></output>
+        </operation>
+    </binding>
+
+    <service name="RiesgoCrediticioService">
+        <port name="RiesgoCrediticioPort" binding="tns:RiesgoCrediticioBinding">
+            <soap:address location="http://localhost:9090/services/RiesgoCredito"/>
+        </port>
+    </service>
+
+</definitions>
