@@ -10,7 +10,7 @@ import com.cajarural.prestamos.domain.model.Prestamo;
 //NOTA: Al añadir una operación a la API, se declara como interfaz primero, luego sei mplementa en el Service
 public interface EjecutarPrestamoUseCase {
 
-	Prestamo solicitarPrestamo(String niftitular, String importStr, int plazoMeses, double tasaInteresAnual);
+	Prestamo solicitarPrestamo(String niftitular, String importeStr, int plazoMeses, double tasaInteresAnual);
 	
 	/*
 	 * TODO: implementar TICKET PREST-42
