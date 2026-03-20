@@ -3,6 +3,8 @@ package com.cajarural.prestamos.application;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.stereotype.Service;
+
 import com.cajarural.prestamos.domain.model.CuotaAmortizacion;
 import com.cajarural.prestamos.domain.model.Importe;
 import com.cajarural.prestamos.domain.model.NivelRiesgo;
@@ -12,6 +14,7 @@ import com.cajarural.prestamos.domain.port.out.PrestamoRepositoryPort;
 import com.cajarural.prestamos.domain.port.out.RiesgoCrediticioPort;
 
 //Implementa el puerto de entrada, se comunica con las interfaces -puertos de salida-, por ello es posible testearla con Mock
+@Service
 public class EjecutarPrestamoService implements EjecutarPrestamoUseCase{
 	
 	//Implementa los puertos por constructor
