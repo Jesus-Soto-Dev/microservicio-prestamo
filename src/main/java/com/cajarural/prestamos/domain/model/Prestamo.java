@@ -1,5 +1,10 @@
 package com.cajarural.prestamos.domain.model;
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -13,6 +18,7 @@ public class Prestamo {
 	private final double tasaInteresAnual;
 	private EstadoPrestamo estado;
 	private final LocalDate fechaSolicitud;
+	private List cuotas;
 	
 	private Prestamo(UUID id, String nifTitular, Importe importe, int plazoMeses, double tasaInteresAnual,
 			EstadoPrestamo estado, LocalDate fechaSolicitud) {
@@ -24,6 +30,7 @@ public class Prestamo {
 		this.tasaInteresAnual = tasaInteresAnual;
 		this.estado = estado;
 		this.fechaSolicitud = fechaSolicitud;
+		this.cuotas = new ArrayList<>(); 
 	}
 	
 	//Factory Method --> estado SOLICITADO
@@ -48,7 +55,6 @@ public class Prestamo {
 	
 	  /*
      * Aprueba el préstamo si está en estado SOLICITADO.
-     * TODO: al aprobar, generar el cuadro de amortización. Ver ticket PREST-42.
      */
     public void aprobar() {
         if (this.estado != EstadoPrestamo.SOLICITADO) {
@@ -56,6 +62,7 @@ public class Prestamo {
                 "Solo se pueden aprobar préstamos SOLICITADOS, estado actual: " + estado);
         }
         this.estado = EstadoPrestamo.APROBADO;
+        this.cuotas = calcularCuadroAmortizacion();
     }
 
     /* Rechaza el préstamo si está en estado SOLICITADO.
@@ -72,7 +79,36 @@ public class Prestamo {
      * TODO: implementar cálculo de cuadro de amortización.  Ver ticket PREST-42.
      */
     public List<CuotaAmortizacion> getCuotas() {
-        throw new UnsupportedOperationException("No implementado aún — ver ticket PREST-42");
+        return Collections.unmodifiableList(cuotas);
+    }
+    
+    private List<CuotaAmortizacion> calcularCuadroAmortizacion() {
+    	List<CuotaAmortizacion> resultado = new ArrayList<>();
+    	BigDecimal capital = importe.getValor();
+    	BigDecimal tasaMensual = BigDecimal.valueOf(tasaInteresAnual).divide(BigDecimal.valueOf(12 * 100), 10, RoundingMode.HALF_UP);
+    	BigDecimal numerador = capital.multiply(tasaMensual);
+    	BigDecimal unoPlusTasa = BigDecimal.ONE.add(tasaMensual);
+    	BigDecimal potencia = unoPlusTasa.pow(plazoMeses, MathContext.DECIMAL128);
+    	BigDecimal potenciaNegativa = BigDecimal.ONE.divide(potencia,10,RoundingMode.HALF_UP);
+    	BigDecimal denominador = BigDecimal.ONE.subtract(potenciaNegativa); 
+    	BigDecimal cuotaMensual = numerador.divide(denominador, 2, RoundingMode.HALF_UP);
+    	
+    	BigDecimal saldoPendiente = capital;
+    	LocalDate fechaCuota = fechaSolicitud.plusMonths(1);
+    	for(int mes = 1; mes <= plazoMeses; mes++) {
+    		BigDecimal interes = saldoPendiente.multiply(tasaMensual).setScale(2, RoundingMode.HALF_UP);
+    		BigDecimal capitalAmortizado = cuotaMensual.subtract(interes);
+    		saldoPendiente = saldoPendiente.subtract(capitalAmortizado);
+    		if(mes == plazoMeses) {
+    			capitalAmortizado = capitalAmortizado.add(saldoPendiente);
+    			saldoPendiente = BigDecimal.ZERO;
+    		}
+    		resultado.add(new CuotaAmortizacion(
+    			mes,fechaCuota,cuotaMensual,capitalAmortizado,interes,saldoPendiente.max(BigDecimal.ZERO)	
+    		));
+    		fechaCuota = fechaCuota.plusMonths(1);
+    	}
+    	return resultado;
     }
 
     // Getters

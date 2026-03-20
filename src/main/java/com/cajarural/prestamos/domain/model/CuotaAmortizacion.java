@@ -17,7 +17,7 @@ public final class CuotaAmortizacion { //Value Object
 	
 	private final BigDecimal saldoPendiente; //Total-cuota
 
-	private CuotaAmortizacion(int numeroCuota, LocalDate fechaVencimiento, BigDecimal cuotaMensual,
+	public CuotaAmortizacion(int numeroCuota, LocalDate fechaVencimiento, BigDecimal cuotaMensual,
 			BigDecimal capitalAmortizado, BigDecimal intereses, BigDecimal saldoPendiente) {
 		super();
 		this.numeroCuota = numeroCuota;
