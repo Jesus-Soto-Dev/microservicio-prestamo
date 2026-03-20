@@ -39,6 +39,13 @@ public class Prestamo {
 				UUID.randomUUID(), nifTitular, importe, plazoMeses, tasaInteresAnual, EstadoPrestamo.SOLICITADO, LocalDate.now()
 				);
 	}
+	
+	// Factory method para reconstruir desde persistencia.
+	public static Prestamo reconstituir(UUID id, String nifTitular, Importe importe, int plazoMeses, double tasaInteresAnual,
+			EstadoPrestamo estado, LocalDate fechaSolicitud) {
+		return new Prestamo(id, nifTitular, importe, plazoMeses, tasaInteresAnual, estado, fechaSolicitud);
+	}
+	
 	  /*
      * Aprueba el préstamo si está en estado SOLICITADO.
      * TODO: al aprobar, generar el cuadro de amortización. Ver ticket PREST-42.
