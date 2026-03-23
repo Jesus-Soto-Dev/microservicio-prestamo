@@ -1,11 +1,14 @@
 package com.cajarural.prestamos.application;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
 import com.cajarural.prestamos.domain.model.CuotaAmortizacion;
+import com.cajarural.prestamos.domain.model.EstadoPrestamo;
 import com.cajarural.prestamos.domain.model.Importe;
 import com.cajarural.prestamos.domain.model.NivelRiesgo;
 import com.cajarural.prestamos.domain.model.Prestamo;
@@ -57,8 +60,11 @@ public class EjecutarPrestamoService implements EjecutarPrestamoUseCase{
 	/* Pendiente de implementación*/
 	@Override
 	public List<CuotaAmortizacion> obtenerAmortizacion(UUID prestamoId) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Pendiente de implementar");
+		Prestamo prestamo = repositoryPort.buscarPorId(prestamoId)
+				.orElseThrow(() -> new IllegalArgumentException("No existe préstamo con id : " + prestamoId));
+		
+		if(prestamo.getEstado() != EstadoPrestamo.APROBADO) throw new IllegalStateException("El préstamo " + prestamoId + " no está APROBADO, estado actual: " + prestamo.getEstado());
+		return prestamo.getCuotas();
 	}
 
 }

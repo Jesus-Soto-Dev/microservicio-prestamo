@@ -1,5 +1,6 @@
 package com.cajarural.prestamos.infrastructure.in.rest;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cajarural.prestamos.domain.model.CuotaAmortizacion;
 import com.cajarural.prestamos.domain.model.Prestamo;
 import com.cajarural.prestamos.domain.port.in.EjecutarPrestamoUseCase;
 
@@ -45,6 +47,7 @@ public class PrestamoController {
      */
     @GetMapping("/{id}/amortizacion")
     public ResponseEntity<?> obtenerAmortizacion(@PathVariable UUID id) {
-        throw new UnsupportedOperationException("No implementado aún");
+        List<CuotaAmortizacion> cuotas = useCase.obtenerAmortizacion(id);
+        return ResponseEntity.status(HttpStatus.OK).body(cuotas);
     }
 }

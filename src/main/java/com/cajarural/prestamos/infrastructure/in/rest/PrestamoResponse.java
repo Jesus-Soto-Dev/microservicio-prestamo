@@ -1,13 +1,16 @@
 package com.cajarural.prestamos.infrastructure.in.rest;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
+import com.cajarural.prestamos.domain.model.CuotaAmortizacion;
+import com.cajarural.prestamos.domain.model.EstadoPrestamo;
 import com.cajarural.prestamos.domain.model.Prestamo;
 
 /**
  * DTO de salida --> el JSON que devuelve la API
- * Se traduce del dominio a eset DTO
+ * Se traduce del dominio a este DTO
  * */
 public class PrestamoResponse {
     private UUID id;
@@ -17,9 +20,8 @@ public class PrestamoResponse {
     private double tasaInteresAnual;
     private String estado;
     private LocalDate fechaSolicitud;
+    private List<CuotaAmortizacion> cuotas;
 
-    // TODO: descomentar cuando se implemente PREST-42
-    // private List<CuotaAmortizacion> cuotas;
     public PrestamoResponse() {}
     
     //Factory method: traduce Dominio a DTO
@@ -32,8 +34,15 @@ public class PrestamoResponse {
     	response.tasaInteresAnual = prestamo.getTasaInteresAnual();
     	response.estado = prestamo.getEstado().name();
     	response.fechaSolicitud = prestamo.getFechaSolicitud();
+    	if(prestamo.getEstado() == EstadoPrestamo.APROBADO) {
+    		response.cuotas = prestamo.getCuotas();
+    	}
     	return response;
     }
+
+	public List<CuotaAmortizacion> getCuotas() {
+		return cuotas;
+	}
 
 	public UUID getId() {
 		return id;
