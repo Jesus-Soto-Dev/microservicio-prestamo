@@ -50,7 +50,11 @@ public class Prestamo {
 	// Factory method para reconstruir desde persistencia.
 	public static Prestamo reconstituir(UUID id, String nifTitular, Importe importe, int plazoMeses, double tasaInteresAnual,
 			EstadoPrestamo estado, LocalDate fechaSolicitud) {
-		return new Prestamo(id, nifTitular, importe, plazoMeses, tasaInteresAnual, estado, fechaSolicitud);
+		Prestamo prestamo = new Prestamo(id, nifTitular, importe, plazoMeses, tasaInteresAnual, estado, fechaSolicitud);
+		if (estado == EstadoPrestamo.APROBADO) {
+			prestamo.cuotas = prestamo.calcularCuadroAmortizacion(); //No se creó tabla para las cuotas, por ello se vuelven a calcular 
+		}
+		return prestamo;
 	}
 	
 	  /*
